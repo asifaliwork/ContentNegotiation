@@ -1,0 +1,52 @@
+﻿ @{
+    ViewData["Title"] = "Privacy Policy";
+}
+<h1>@ViewData["Title"]</h1> 
+<body>
+
+    <div class="form-group col-2 " id="divFormatList">
+        <label> Select Format </label>
+        @* <label class="col-md-2" asp-for="Format"></label>
+        <select asp-for="Format"
+                asp-items="@ContentNegotiation.Helper.Helper.GetFormatForDropDown()"
+                class="form-control"></select> *@
+        @Html.DropDownList("FormatId", @ContentNegotiation.Helper.Helper.GetFormatForDropDown())
+    </div>
+</body>
+
+
+<script>
+
+    $("#FormatId").click(function () {
+        // To hold various type of content format
+        var formatRequested = $("#FormatId");
+        //formatRequested = "text/json";
+        //formatRequested = "text/xml";
+        //formatRequested = "someNonSupportedFormat";
+        //formatRequested = "text/mycustomtype";
+        //formatRequested = "application/mycustomtype";
+        // This method is used in AJAX call.
+        // You can use any of above metioned content format and see the different results
+        beforeSendSpecifyContentFormat = function (req) {
+            req.setRequestHeader("Accept", formatRequested);
+        },
+        debugger;
+            $.ajax({
+                url: "http://localhost:1764/api/Customer/getcustomer",
+                //beforeSend: beforeSendSpecifyContentFormat,
+                success: function (result) {
+                    var output;
+                    var checkIfXML = $.isXMLDoc(result);
+                    if (checkIfXML) {
+                        var oSerializer = new XMLSerializer();
+                        output = oSerializer.serializeToString(result);
+                    }
+                    else {
+                        output = JSON.stringify(result);
+                    }
+                    $("#divResult").text(output);
+                }
+            });
+
+    });
+</script>
